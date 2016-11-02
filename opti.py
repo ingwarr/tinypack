@@ -7,7 +7,7 @@ suffix = ".dep"
 UP_SET = set(package_list)
 #UP_SET.add('mupen64plus.tcz')
 DOWN_SET = set()
-
+deepness = 0
 
 def file_exists(location):
     request = urllib2.Request(location)
@@ -19,6 +19,7 @@ def file_exists(location):
         return False
 
 def opendoor(localset):        
+    print deepness
     DOWN_SET_LOCAL = set()
     locallist = list(localset)
     for eat_em in locallist:
@@ -29,18 +30,23 @@ def opendoor(localset):
             deps = data.split()
             for dep in deps:
                 if dep not in UP_SET:
-                    print dep
+#                    print dep
                     UP_SET.add(dep)
                     DOWN_SET_LOCAL.add(dep)
                     package_list.append(dep)
+                elif dep not in DOWN_SET_LOCAL :
+                    print dep,"already in UP_SET ergo deepness should be increased, now it ", deepness, " level"
+                    package_list.remove(dep)
+                    package_list.append(dep)
+                    DOWN_SET_LOCAL.add(dep)
+                    # for index in range(len(package_list))[::-1]:
+                    #     print package_list[index]
+                    #     if package_list[index] == dep: 
+                    #         delpack = package_list.pop(index)
+                    #         package_list.append(dep)
+                    #         DOWN_SET_LOCAL.add(dep)
                 else:
-                    print dep,"already in UP_SET ergo deepness should be updated"
-                    for index in range(len(package_list))[::-1]:
-                        print package_list[index]
-                        if package_list[index] == dep: 
-                            delpack = package_list.pop(index)
-                            package_list.append(dep)
-                            DOWN_SET_LOCAL.add(dep)
+                    print "This package", dep, " already processed"
         else:
             print "File not found (package", eat_em, "has no deps)"
 #    print DOWN_SET_LOCAL
@@ -49,7 +55,9 @@ def opendoor(localset):
 
 DOWN_SET = opendoor(UP_SET)
 while not len(DOWN_SET) == 0:
+    deepness +=1
     DOWN_SET = opendoor(DOWN_SET)
+
     
 
 
@@ -57,7 +65,7 @@ while not len(DOWN_SET) == 0:
 #print opendoor(DOWN_SET)            
 for packname in UP_SET:
     print packname
-print package_list
+print package_list[::-1]
 #print DOWN_SET
 #print UP_SET.difference(DOWN_SET)
 
