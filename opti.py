@@ -8,6 +8,7 @@ UP_SET = set(package_list)
 #UP_SET.add('mupen64plus.tcz')
 DOWN_SET = set()
 
+
 def file_exists(location):
     request = urllib2.Request(location)
     request.get_method = lambda : 'HEAD'
@@ -31,8 +32,15 @@ def opendoor(localset):
                     print dep
                     UP_SET.add(dep)
                     DOWN_SET_LOCAL.add(dep)
+                    package_list.append(dep)
                 else:
-                    print dep,"already in UP_SET"
+                    print dep,"already in UP_SET ergo deepness should be updated"
+                    for index in range(len(package_list))[::-1]:
+                        print package_list[index]
+                        if package_list[index] == dep: 
+                            delpack = package_list.pop(index)
+                            package_list.append(dep)
+                            DOWN_SET_LOCAL.add(dep)
         else:
             print "File not found (package", eat_em, "has no deps)"
 #    print DOWN_SET_LOCAL
@@ -49,6 +57,7 @@ while not len(DOWN_SET) == 0:
 #print opendoor(DOWN_SET)            
 for packname in UP_SET:
     print packname
+print package_list
 #print DOWN_SET
 #print UP_SET.difference(DOWN_SET)
 
